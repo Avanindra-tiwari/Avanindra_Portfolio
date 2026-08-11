@@ -1943,9 +1943,13 @@ a.contact-info-val:hover { color: var(--accent); }
 .back-to-top:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-glow); }
 
 /* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .hero-grid { gap: 2.5rem; }
+}
+
 @media (max-width: 1024px) {
   .project-card {
-    grid-template-columns: auto 220px 1fr auto;
+    grid-template-columns: auto 200px 1fr auto;
   }
   .analytics-metrics {
     grid-template-columns: repeat(2, 1fr);
@@ -1953,80 +1957,193 @@ a.contact-info-val:hover { color: var(--accent); }
   .cert-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  .pillar-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .about-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
+/* ─── Tablet ≤ 860px ────────────────────────────────────────── */
 @media (max-width: 860px) {
+
+  /* ── Hero: text first, THEN avatar, THEN code card ── */
   .hero-grid {
     grid-template-columns: 1fr;
     text-align: center;
-    padding: 4rem 0 3rem;
-    gap: 2.5rem;
+    padding: 3rem 0 2.5rem;
+    gap: 0;
     min-height: unset;
   }
 
+  /* Left copy column becomes top, split into sub-sections */
   .hero-copy { order: 1; }
   .hero-visual { order: 2; }
 
-  .hero-buttons, .social-row { justify-content: center; }
-  .hero-text { margin-left: auto; margin-right: auto; }
+  /* Avatar wrapper shows immediately after name — push between name and buttons */
+  .hero-avatar-wrap {
+    margin: 2rem auto 0;
+    display: flex;
+    justify-content: center;
+  }
 
+  /* Stack hero copy items with avatar injected between heading & buttons */
+  .hero-buttons, .social-row {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .hero-text {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 480px;
+  }
+  .eyebrow { margin: 0 auto 1rem; }
+
+  /* Hide floating chips & code card on small screens */
   .chip-one, .chip-two { display: none; }
+  .code-card-wrap { display: none; }
 
-  /* Avatar stays centered on mobile */
-  .profile-frame-wrap { width: 300px; height: 300px; }
-  .profile-ring-outer { width: 300px; height: 300px; }
-  .profile-ring-inner { width: 250px; height: 250px; }
-  .profile-frame { width: 200px; height: 200px; }
-  .profile-initials { font-size: 3rem; }
+  /* Avatar size on tablet */
+  .profile-frame-wrap { width: 220px; height: 220px; }
+  .profile-ring-outer { width: 220px; height: 220px; }
+  .profile-ring-inner { width: 192px; height: 192px; }
+  .profile-frame       { width: 170px; height: 170px; }
+  .profile-initials    { font-size: 3.2rem; }
 
+  /* Navbar */
   .nav-links-desktop { display: none; }
-  .menu-btn { display: grid; }
-  .nav-cta { display: none; }
+  .menu-btn          { display: grid; }
+  .nav-cta           { display: none; }
 
-  .about-grid, .section-heading { grid-template-columns: 1fr; }
-  .pillar-cards-grid { grid-template-columns: 1fr; }
-  .about-stats { grid-template-columns: repeat(2, 1fr); }
+  /* About */
+  .about-grid         { grid-template-columns: 1fr; }
+  .section-heading    { grid-template-columns: 1fr; }
+  .pillar-cards-grid  { grid-template-columns: repeat(2, 1fr); }
+  .about-stats        { grid-template-columns: repeat(2, 1fr); }
 
+  /* Projects */
   .project-card {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto auto;
   }
+  .project-number       { font-size: 1.5rem; }
+  .project-image-wrap   { width: 100%; height: 200px; }
+  .project-actions-column { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
 
-  .project-number { font-size: 1.5rem; }
-  .project-image-wrap { width: 100%; }
-  .project-actions-column { flex-direction: row; align-items: center; }
-
+  /* Contact */
   .contact-layout { grid-template-columns: 1fr; }
 
+  /* Analytics */
   .analytics-insights { grid-template-columns: 1fr; }
+  .analytics-metrics  { grid-template-columns: repeat(2, 1fr); }
 
-  .modal-grid { grid-template-columns: 1fr; }
+  /* Modal */
+  .modal-grid        { grid-template-columns: 1fr; }
   .modal-footer-meta { grid-template-columns: 1fr; }
+
+  /* Education timeline */
+  .education-timeline { padding-left: 3rem; }
 }
 
+/* ─── Mobile ≤ 640px ────────────────────────────────────────── */
 @media (max-width: 640px) {
   :root { --section-py: 4rem; }
 
-  .container { padding: 0 1.25rem; }
+  .container { padding: 0 1.1rem; }
 
-  h1 { font-size: clamp(2.2rem, 10vw, 3rem); }
+  /* Hero heading */
+  h1 { font-size: clamp(2rem, 9vw, 2.8rem); }
+  h2 { font-size: clamp(1.7rem, 7vw, 2.4rem); }
 
-  .analytics-metrics { grid-template-columns: 1fr 1fr; }
+  /* Avatar smaller on phones */
+  .profile-frame-wrap { width: 170px; height: 170px; }
+  .profile-ring-outer { width: 170px; height: 170px; }
+  .profile-ring-inner { width: 148px; height: 148px; }
+  .profile-frame       { width: 130px; height: 130px; }
+  .profile-initials    { font-size: 2.6rem; }
+  .hero-avatar-wrap    { margin: 1.5rem auto 0; }
 
+  /* Hide code card on phone too */
+  .code-card-wrap { display: none; }
+
+  /* Buttons stack */
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .hero-buttons a { width: 100%; max-width: 280px; justify-content: center; }
+
+  /* Pillar cards full-width */
+  .pillar-cards-grid  { grid-template-columns: 1fr; }
+  .about-stats        { grid-template-columns: repeat(2, 1fr); }
+
+  /* Skill tabs scroll */
+  .skill-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    padding-bottom: 0.25rem;
+    gap: 0.4rem;
+  }
+  .skill-tab { white-space: nowrap; flex-shrink: 0; }
+
+  /* Skills grid 2 col */
+  .skills-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Analytics */
+  .analytics-metrics  { grid-template-columns: repeat(2, 1fr); }
+  .analytics-insights { grid-template-columns: 1fr; }
+  .bar-chart-wrap     { gap: 0.35rem; }
+  .bar-label          { font-size: 0.52rem; }
+
+  /* Certs */
   .cert-grid { grid-template-columns: 1fr; }
 
+  /* Contact */
   .form-row { grid-template-columns: 1fr; }
 
-  .footer-inner { flex-direction: column; align-items: center; text-align: center; }
-  .footer-links { justify-content: center; }
+  /* Resume */
+  .resume-card-content { padding: 2rem 1.25rem; }
+
+  /* Footer */
+  .footer-inner   { flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
+  .footer-links   { justify-content: center; flex-wrap: wrap; }
   .footer-socials { justify-content: center; }
 
-  .bar-chart-wrap { gap: 0.4rem; }
-  .bar-label { font-size: 0.55rem; }
-
-  .resume-card-content { padding: 2rem 1.5rem; }
-
+  /* Section heading always single column */
   .section-heading { grid-template-columns: 1fr; }
+
+  /* Education */
+  .education-timeline { padding-left: 2.5rem; }
+  .edu-details-row { flex-wrap: wrap; gap: 0.4rem; }
+
+  /* Marquee speed reduce */
+  .marquee-content { animation-duration: 20s; }
+
+  /* Modal full screen */
+  .modal-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+  .modal-overlay { padding: 0 !important; }
+}
+
+/* ─── Extra Small ≤ 380px ───────────────────────────────────── */
+@media (max-width: 380px) {
+  h1 { font-size: clamp(1.8rem, 10vw, 2.4rem); }
+  .profile-frame-wrap { width: 145px; height: 145px; }
+  .profile-ring-outer { width: 145px; height: 145px; }
+  .profile-ring-inner { width: 126px; height: 126px; }
+  .profile-frame       { width: 110px; height: 110px; }
+  .hero-buttons a { max-width: 260px; }
+  .about-stats { grid-template-columns: repeat(2, 1fr); }
+  .skills-grid { grid-template-columns: 1fr; }
+  .analytics-metrics { grid-template-columns: 1fr; }
 }
 
 /* ─── Scrollbar ─────────────────────────────────────────────── */
@@ -2045,6 +2162,27 @@ a.contact-info-val:hover { color: var(--accent); }
 .app-wrap { transition: opacity 0.5s ease; }
 .app-hidden { opacity: 0; pointer-events: none; }
 .app-visible { opacity: 1; }
+
+/* ─── Hero Avatar Dual-Mode Visibility ──────────────────────── */
+/* Desktop (>860px): show avatar in right column, hide mobile copy one */
+.hero-avatar-mobile  { display: none; }
+.hero-avatar-desktop { display: flex; justify-content: center; }
+
+/* Mobile (≤860px): show avatar inside left copy column, hide right-col one */
+@media (max-width: 860px) {
+  .hero-avatar-mobile {
+    display: flex;
+    justify-content: center;
+    margin: 1.8rem auto 0.5rem;
+  }
+  .hero-avatar-desktop { display: none; }
+  /* Hide entire right visual column on mobile (code card + desktop avatar) */
+  .hero-visual { display: none; }
+}
+
+@media (max-width: 640px) {
+  .hero-avatar-mobile { margin: 1.4rem auto 0.3rem; }
+}
 
 /* ─── Scroll Progress Bar ────────────────────────────────────── */
 .scroll-progress-bar {

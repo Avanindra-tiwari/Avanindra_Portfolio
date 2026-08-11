@@ -168,7 +168,6 @@ export default function Hero() {
   const { scrollYProgress } = useScroll();
   const orbY1 = useTransform(scrollYProgress, [0, 1], [0, -300]);
   const orbY2 = useTransform(scrollYProgress, [0, 1], [0, -160]);
-  const orbY3 = useTransform(scrollYProgress, [0, 1], [0, -420]);
 
   return (
     <section id="home" className="hero section">
@@ -179,13 +178,10 @@ export default function Hero() {
       {/* Parallax orbs */}
       <motion.div className="orb orb-one" style={{ y: orbY1 }} />
       <motion.div className="orb orb-two" style={{ y: orbY2 }} />
-      <motion.div
-        className="orb orb-one"
-        style={{ y: orbY3, left: "42%", top: "58%", width: 280, height: 280, opacity: 0.07 }}
-      />
 
       <div className="container hero-grid">
-        {/* ── Left: Copy ─────────────────────────────────────── */}
+
+        {/* ── LEFT / TOP: Copy column ─────────────────────────── */}
         <div className="hero-copy">
           <Reveal delay={0.05}>
             <div className="eyebrow">
@@ -201,6 +197,19 @@ export default function Hero() {
               <span>{personal.name.split(" ")[1]}.</span>
             </h1>
           </Reveal>
+
+          {/*
+           * MOBILE AVATAR — shows between name and buttons on mobile.
+           * Hidden on desktop (>860px) via CSS — the right-column avatar shows there.
+           */}
+          <motion.div
+            className="hero-avatar-mobile"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <ProfileAvatar />
+          </motion.div>
 
           {/* Typing role */}
           <Reveal delay={0.2}>
@@ -243,7 +252,7 @@ export default function Hero() {
                 { href: socials.github, icon: <Github size={17} />, label: "GitHub" },
                 { href: socials.linkedin, icon: <Linkedin size={17} />, label: "LinkedIn" },
                 { href: socials.email, icon: <Mail size={17} />, label: "Email" },
-              ].map((s, i) => (
+              ].map((s) => (
                 <motion.a
                   key={s.label}
                   href={s.href}
@@ -253,9 +262,6 @@ export default function Hero() {
                   aria-label={s.label}
                   whileHover={{ scale: 1.08, color: "var(--accent)", y: -2 }}
                   whileTap={{ scale: 0.92 }}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + i * 0.08, duration: 0.35 }}
                 >
                   {s.icon} {s.label}
                 </motion.a>
@@ -264,11 +270,11 @@ export default function Hero() {
           </Reveal>
         </div>
 
-        {/* ── Right: Visual ───────────────────────────────────── */}
+        {/* ── RIGHT / BOTTOM (desktop only): Visual column ────── */}
         <div className="hero-visual">
-          {/* Profile Avatar */}
+          {/* Desktop avatar — hidden on mobile via CSS */}
           <motion.div
-            className="hero-avatar-wrap"
+            className="hero-avatar-desktop"
             initial={{ opacity: 0, scale: 0.82 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.9, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
@@ -312,8 +318,6 @@ export default function Hero() {
             className="floating-chip chip-one"
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
           >
             <Code2 size={16} /> React.js & Web
           </motion.div>
@@ -321,8 +325,6 @@ export default function Hero() {
             className="floating-chip chip-two"
             animate={{ y: [0, 11, 0] }}
             transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
           >
             <BarChart3 size={16} /> Python Analytics
           </motion.div>
@@ -337,7 +339,7 @@ export default function Hero() {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
       >
-        <span>SCROLL TO EXPLORE</span>
+        <span>SCROLL</span>
         <motion.div
           animate={{ y: [0, 5, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
