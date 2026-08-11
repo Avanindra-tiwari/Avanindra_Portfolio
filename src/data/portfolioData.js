@@ -90,7 +90,7 @@ export const projects = [
     tags: ["React", "CSS", "Framer Motion"],
     icon: "zap",
     githubUrl: personal.github,
-    liveUrl: "#",
+    liveUrl: "https://avanindra-portfolio-mmj9-neon.vercel.app/",
     details: {
       problem: "Static resumes fail to showcase modern frontend animation mastery, interactive data visualization, or responsive design capabilities.",
       solution: "Created an animated 2026-grade personal portfolio using React, Framer Motion, and CSS Custom Properties with 3D mouse tracking tilt and glassmorphism.",
