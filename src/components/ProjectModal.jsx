@@ -3,6 +3,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Github, X } from "lucide-react";
 
 export default function ProjectModal({ project, onClose }) {
+  React.useEffect(() => {
+    if (!project) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    const originalStyle = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalStyle;
+    };
+  }, [project, onClose]);
+
   if (!project) return null;
 
   return (

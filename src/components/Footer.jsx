@@ -21,13 +21,13 @@ export default function Footer() {
         </div>
 
         <div className="footer-socials">
-          <motion.a href={socials.github} target="_blank" rel="noreferrer" whileHover={{ scale: 1.1 }}>
+          <motion.a href={socials.github} target="_blank" rel="noreferrer" whileHover={{ scale: 1.1 }} aria-label="GitHub">
             <Github size={19} />
           </motion.a>
-          <motion.a href={socials.linkedin} target="_blank" rel="noreferrer" whileHover={{ scale: 1.1 }}>
+          <motion.a href={socials.linkedin} target="_blank" rel="noreferrer" whileHover={{ scale: 1.1 }} aria-label="LinkedIn">
             <Linkedin size={19} />
           </motion.a>
-          <motion.a href={socials.email} whileHover={{ scale: 1.1 }}>
+          <motion.a href={socials.email} whileHover={{ scale: 1.1 }} aria-label="Email">
             <Mail size={19} />
           </motion.a>
         </div>
