@@ -3,9 +3,82 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring } from "fram
 import { ArrowDown, ArrowUpRight, BarChart3, Code2, Download, Github, Linkedin, Mail } from "lucide-react";
 import { personal, socials } from "../data/portfolioData";
 
-// ─── Profile Avatar ───────────────────────────────────────────
-// Displays photo if personal.avatar is set, otherwise shows animated initials.
-// To swap your photo: update personal.avatar in src/data/portfolioData.js
+/* ─── Typing Role Effect ───────────────────────────────────── */
+const ROLES = [
+  "CSE Student",
+  "Web Developer",
+  "React Developer",
+  "Data Analyst",
+  "Python Developer",
+];
+
+function TypingRole() {
+  const [idx, setIdx] = React.useState(0);
+  const [text, setText] = React.useState("");
+  const [phase, setPhase] = React.useState("typing");
+
+  React.useEffect(() => {
+    const current = ROLES[idx];
+    let t;
+    if (phase === "typing") {
+      if (text.length < current.length) {
+        t = setTimeout(() => setText(current.slice(0, text.length + 1)), 85);
+      } else {
+        t = setTimeout(() => setPhase("pausing"), 1800);
+      }
+    } else if (phase === "pausing") {
+      t = setTimeout(() => setPhase("deleting"), 80);
+    } else {
+      if (text.length > 0) {
+        t = setTimeout(() => setText(current.slice(0, text.length - 1)), 42);
+      } else {
+        setIdx((p) => (p + 1) % ROLES.length);
+        setPhase("typing");
+      }
+    }
+    return () => clearTimeout(t);
+  }, [text, phase, idx]);
+
+  return (
+    <span className="typing-wrap">
+      <span className="typing-text">{text}</span>
+      <span className="typing-cursor" aria-hidden="true">|</span>
+    </span>
+  );
+}
+
+/* ─── Subtle Particle Field ────────────────────────────────── */
+const PARTICLES = Array.from({ length: 14 }, (_, i) => ({
+  id: i,
+  left: `${(i * 7.3 + 4) % 96}%`,
+  top: `${(i * 13.7 + 8) % 92}%`,
+  size: i % 3 === 0 ? 3 : i % 3 === 1 ? 2 : 1.5,
+  dur: 6 + (i % 5) * 2.2,
+  delay: -(i % 6) * 1.3,
+}));
+
+function ParticleField() {
+  return (
+    <div className="particle-field" aria-hidden="true">
+      {PARTICLES.map((p) => (
+        <span
+          key={p.id}
+          className="particle"
+          style={{
+            left: p.left,
+            top: p.top,
+            width: p.size,
+            height: p.size,
+            animationDuration: `${p.dur}s`,
+            animationDelay: `${p.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ─── Profile Avatar ───────────────────────────────────────── */
 function ProfileAvatar() {
   const initials = personal.name
     .split(" ")
@@ -14,30 +87,16 @@ function ProfileAvatar() {
 
   return (
     <div className="profile-frame-wrap">
-
-      {/* Animated outer ring */}
       <motion.div
         className="profile-ring profile-ring-outer"
         animate={{ rotate: 360 }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: "linear",
-        }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
       />
-
-      {/* Animated inner ring */}
       <motion.div
         className="profile-ring profile-ring-inner"
         animate={{ rotate: -360 }}
-        transition={{
-          duration: 12,
-          repeat: Infinity,
-          ease: "linear",
-        }}
+        transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
       />
-
-      {/* Profile photo / initials */}
       <div className="profile-frame">
         {personal.avatar ? (
           <img
@@ -45,41 +104,58 @@ function ProfileAvatar() {
             alt={`${personal.name} — Profile Photo`}
             className="profile-photo"
             onError={(e) => {
-              e.currentTarget.style.display = "none";
-              const fallback = e.currentTarget.nextSibling;
-              if (fallback) fallback.style.display = "flex";
+              e.target.style.display = "none";
+              e.target.nextSibling.style.display = "flex";
             }}
           />
         ) : null}
-
-        {/* Initials fallback */}
         <div
           className="profile-initials"
-          style={{
-            display: personal.avatar ? "none" : "flex",
-          }}
+          style={{ display: personal.avatar ? "none" : "flex" }}
         >
           {initials}
         </div>
       </div>
-
-      {/* Status badge */}
       <div className="profile-status-badge">
-        <span className="pulse" />
-        Available
+        <span className="pulse" /> Available
       </div>
-
     </div>
   );
 }
 
+/* ─── 3D Tilt Card ─────────────────────────────────────────── */
+function TiltCard({ children, className = "", maxTilt = 8 }) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotX = useSpring(useTransform(y, [-0.5, 0.5], [maxTilt, -maxTilt]), { stiffness: 220, damping: 18 });
+  const rotY = useSpring(useTransform(x, [-0.5, 0.5], [-maxTilt, maxTilt]), { stiffness: 220, damping: 18 });
+
+  const onMove = (e) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    x.set((e.clientX - r.left) / r.width - 0.5);
+    y.set((e.clientY - r.top) / r.height - 0.5);
+  };
+  const onLeave = () => { x.set(0); y.set(0); };
+
+  return (
+    <motion.div
+      className={className}
+      style={{ rotateX: rotX, rotateY: rotY }}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ─── Reveal Wrapper ───────────────────────────────────────── */
 function Reveal({ children, delay = 0, className = "" }) {
   return (
     <motion.div
       className={className}
       initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
@@ -87,69 +163,37 @@ function Reveal({ children, delay = 0, className = "" }) {
   );
 }
 
-function TiltCard({ children, className = "", maxTilt = 8 }) {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const rotateXRaw = useTransform(y, [-0.5, 0.5], [maxTilt, -maxTilt]);
-  const rotateYRaw = useTransform(x, [-0.5, 0.5], [-maxTilt, maxTilt]);
-
-  const rotateX = useSpring(rotateXRaw, { stiffness: 220, damping: 18 });
-  const rotateY = useSpring(rotateYRaw, { stiffness: 220, damping: 18 });
-
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    x.set(mouseX / width - 0.5);
-    y.set(mouseY / height - 0.5);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  return (
-    <motion.div
-      className={className}
-      style={{ rotateX, rotateY }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
+/* ─── Hero ─────────────────────────────────────────────────── */
 export default function Hero() {
   const { scrollYProgress } = useScroll();
-
-  const orbY1 = useTransform(scrollYProgress, [0, 1], [0, -320]);
-  const orbY2 = useTransform(scrollYProgress, [0, 1], [0, -180]);
+  const orbY1 = useTransform(scrollYProgress, [0, 1], [0, -300]);
+  const orbY2 = useTransform(scrollYProgress, [0, 1], [0, -160]);
   const orbY3 = useTransform(scrollYProgress, [0, 1], [0, -420]);
-
-  const heroCodeRotateX = useTransform(scrollYProgress, [0, 0.25], [10, 0]);
-  const heroCodeRotateY = useTransform(scrollYProgress, [0, 0.25], [-8, 0]);
 
   return (
     <section id="home" className="hero section">
+      {/* Grid + particles */}
       <div className="grid-bg" />
+      <ParticleField />
+
+      {/* Parallax orbs */}
       <motion.div className="orb orb-one" style={{ y: orbY1 }} />
       <motion.div className="orb orb-two" style={{ y: orbY2 }} />
-      <motion.div className="orb orb-one" style={{ y: orbY3, left: "40%", top: "60%", width: 250, height: 250, opacity: 0.08 }} />
+      <motion.div
+        className="orb orb-one"
+        style={{ y: orbY3, left: "42%", top: "58%", width: 280, height: 280, opacity: 0.07 }}
+      />
 
       <div className="container hero-grid">
+        {/* ── Left: Copy ─────────────────────────────────────── */}
         <div className="hero-copy">
-          <Reveal>
+          <Reveal delay={0.05}>
             <div className="eyebrow">
               <span className="pulse" /> AVAILABLE FOR OPPORTUNITIES
             </div>
           </Reveal>
 
-          <Reveal delay={0.08}>
+          <Reveal delay={0.12}>
             <p className="hero-kicker">HELLO, I'M</p>
             <h1>
               {personal.name.split(" ")[0]}
@@ -158,93 +202,149 @@ export default function Hero() {
             </h1>
           </Reveal>
 
-          <Reveal delay={0.16}>
-            <p className="hero-role">
-              <strong>{personal.title.split("|")[0]}</strong> <span>•</span> {personal.title.split("|")[1]} <span>•</span> {personal.title.split("|")[2]}
+          {/* Typing role */}
+          <Reveal delay={0.2}>
+            <p className="hero-role-typing">
+              <TypingRole />
             </p>
-            <p className="hero-text">
-              {personal.shortIntro}
-            </p>
+            <p className="hero-text">{personal.shortIntro}</p>
           </Reveal>
 
-          <Reveal delay={0.24}>
+          {/* CTA buttons */}
+          <Reveal delay={0.28}>
             <div className="hero-buttons">
-              <motion.a className="primary-btn" href="#projects" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.95 }}>
-                View My Projects <ArrowUpRight size={18} />
-              </motion.a>
-              <motion.a className="secondary-btn" href={personal.resume} target="_blank" rel="noreferrer" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.95 }}>
-                Download Resume <Download size={16} />
-              </motion.a>
-              <motion.a className="secondary-btn" href="#contact" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.95 }}>
-                Contact Me
-              </motion.a>
+              {[
+                { href: "#projects", label: "View My Projects", icon: <ArrowUpRight size={17} />, primary: true },
+                { href: personal.resume, label: "Download Resume", icon: <Download size={16} />, primary: false, download: true },
+                { href: "#contact", label: "Contact Me", primary: false },
+              ].map((btn, i) => (
+                <motion.a
+                  key={btn.label}
+                  className={btn.primary ? "primary-btn" : "secondary-btn"}
+                  href={btn.href}
+                  target={btn.download ? "_blank" : undefined}
+                  rel={btn.download ? "noreferrer" : undefined}
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.32 + i * 0.07, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {btn.label} {btn.icon}
+                </motion.a>
+              ))}
             </div>
           </Reveal>
 
-          <Reveal delay={0.3}>
+          {/* Social row */}
+          <Reveal delay={0.44}>
             <div className="social-row">
-              <motion.a href={socials.github} target="_blank" rel="noreferrer" whileHover={{ scale: 1.05, color: "var(--accent)" }}>
-                <Github size={18} /> GitHub
-              </motion.a>
-              <motion.a href={socials.linkedin} target="_blank" rel="noreferrer" whileHover={{ scale: 1.05, color: "var(--accent)" }}>
-                <Linkedin size={18} /> LinkedIn
-              </motion.a>
-              <motion.a href={socials.email} whileHover={{ scale: 1.05, color: "var(--accent)" }}>
-                <Mail size={18} /> Email
-              </motion.a>
+              {[
+                { href: socials.github, icon: <Github size={17} />, label: "GitHub" },
+                { href: socials.linkedin, icon: <Linkedin size={17} />, label: "LinkedIn" },
+                { href: socials.email, icon: <Mail size={17} />, label: "Email" },
+              ].map((s, i) => (
+                <motion.a
+                  key={s.label}
+                  href={s.href}
+                  target={s.label !== "Email" ? "_blank" : undefined}
+                  rel={s.label !== "Email" ? "noreferrer" : undefined}
+                  className="social-link"
+                  aria-label={s.label}
+                  whileHover={{ scale: 1.08, color: "var(--accent)", y: -2 }}
+                  whileTap={{ scale: 0.92 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + i * 0.08, duration: 0.35 }}
+                >
+                  {s.icon} {s.label}
+                </motion.a>
+              ))}
             </div>
           </Reveal>
         </div>
 
+        {/* ── Right: Visual ───────────────────────────────────── */}
         <div className="hero-visual">
-          {/* ── Profile Photo ─────────────────────────────────────── */}
-          {/* Replace photo: update personal.avatar in src/data/portfolioData.js  */}
+          {/* Profile Avatar */}
           <motion.div
             className="hero-avatar-wrap"
-            initial={{ opacity: 0, scale: 0.85 }}
+            initial={{ opacity: 0, scale: 0.82 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.9, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
           >
             <ProfileAvatar />
           </motion.div>
 
+          {/* Code Card */}
           <TiltCard className="code-card-wrap">
             <motion.div
               className="code-card"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              style={{ rotateX: heroCodeRotateX, rotateY: heroCodeRotateY }}
-              transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 24, scale: 0.94 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.9, delay: 0.32, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="code-top">
                 <div className="window-dots"><i /><i /><i /></div>
                 <span>avanindra.js</span>
               </div>
-              <pre><code><span className="c-purple">const</span> <span className="c-blue">developer</span> = {'{'}{'\n'}
-  <span className="c-green">name</span>: <span className="c-yellow">"{personal.name}"</span>,{'\n'}
-  <span className="c-green">major</span>: <span className="c-yellow">"CSE Engineering"</span>,{'\n'}
-  <span className="c-green">focus</span>: [<span className="c-yellow">"Web App Development"</span>, <span className="c-yellow">"Data Analytics"</span>],{'\n'}
-  <span className="c-green">passion</span>: <span className="c-yellow">"Build & Insights"</span>{'\n'}
-{'}'}</code></pre>
+              <pre><code>
+                <span className="c-purple">const</span>{" "}
+                <span className="c-blue">developer</span> = {"{\n"}
+{"  "}<span className="c-green">name</span>:{" "}
+                <span className="c-yellow">"{personal.name}"</span>,{"\n"}
+{"  "}<span className="c-green">major</span>:{" "}
+                <span className="c-yellow">"CSE Engineering"</span>,{"\n"}
+{"  "}<span className="c-green">focus</span>: [<span className="c-yellow">"Web Dev"</span>,{" "}
+                <span className="c-yellow">"Data Analytics"</span>],{"\n"}
+{"  "}<span className="c-green">passion</span>:{" "}
+                <span className="c-yellow">"Build &amp; Insights"</span>{"\n"}
+{"}"}</code></pre>
               <div className="code-status">
-                <span className="status-dot" /> building modern web experiences<span className="cursor">_</span>
+                <span className="status-dot" /> building modern web experiences
+                <span className="cursor">_</span>
               </div>
             </motion.div>
           </TiltCard>
 
-          <motion.div className="floating-chip chip-one" animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-            <Code2 size={17} /> React.js & Web
+          {/* Floating tech chips */}
+          <motion.div
+            className="floating-chip chip-one"
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+          >
+            <Code2 size={16} /> React.js & Web
           </motion.div>
-          <motion.div className="floating-chip chip-two" animate={{ y: [0, 10, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
-            <BarChart3 size={17} /> Python Data Analytics
+          <motion.div
+            className="floating-chip chip-two"
+            animate={{ y: [0, 11, 0] }}
+            transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+          >
+            <BarChart3 size={16} /> Python Analytics
           </motion.div>
         </div>
       </div>
 
-      <a className="scroll-cue" href="#about">
+      {/* Scroll cue */}
+      <motion.a
+        className="scroll-cue"
+        href="#about"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2 }}
+      >
         <span>SCROLL TO EXPLORE</span>
-        <ArrowDown size={16} />
-      </a>
+        <motion.div
+          animate={{ y: [0, 5, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <ArrowDown size={16} />
+        </motion.div>
+      </motion.a>
     </section>
   );
 }
